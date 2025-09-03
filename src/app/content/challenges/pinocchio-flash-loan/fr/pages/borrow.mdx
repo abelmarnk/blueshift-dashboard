@@ -237,4 +237,6 @@ if unsafe { instruction.get_account_meta_at_unchecked(1).key } != *self.accounts
 }
 ```
 
+En guise de conclusion, remarquez que nous n’avons effectué aucune vérification concernant plusieurs instructions borrow ou un emprunt via CPI, ce qui aurait permis des emprunts non remboursés. Cela est dû au compte de données loan qui n’autorise qu’une seule instruction borrow (Peux-tu expliquer pourquoi ?), donc ces vérifications ne sont pas nécessaires, même si cette approche rend les transactions exécutables en parallèle à travers les niveaux de frais plutôt qu’entre les pools.
+
 > Utiliser un compte `loan` et structurer l'introspection des instructions de cette manière garantit que nous n'avons pas besoin d'effectuer d'introspection dans l'instruction `repay` puisque toutes les vérifications de remboursement seront gérées par le compte `loan`.
