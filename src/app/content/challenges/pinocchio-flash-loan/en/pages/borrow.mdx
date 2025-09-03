@@ -239,4 +239,6 @@ if unsafe { instruction.get_account_meta_at_unchecked(1).key } != *self.accounts
 }
 ```
 
+On a final note, notice we did not make any checks for multiple borrow instructions, or borrowing through CPI, which would have allowed for unrepaid borrows, this is because of the loan data account which would allow for only one borrow instruction(Can you tell why?), so those checks aren't necessary, though this approach would make transactions executable in parallel across fee tiers rather than across pools.
+
 > Using a `loan` account and structuring the instruction introspection this way ensures that we don't actually need to do any introspection in the `repay` instruction since all repayment checks will be handled by the `loan` account.
