@@ -176,6 +176,8 @@ pub enum ProtocolError {
     MissingBorrowIx,
     #[msg("Overflow")]
     Overflow,
+    #[msg("Borrow through CPI is not allowed")]
+    NoCPIBorrowAllowed
 }
 ```
 
