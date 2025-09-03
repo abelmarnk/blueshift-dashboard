@@ -55,9 +55,11 @@ let ixs = ctx.accounts.instructions.to_account_info();
 ```
 
 Cuối cùng, chúng ta thực hiện kiểm tra quan trọng nhất: đảm bảo rằng instruction cuối cùng trong transaction là một instruction trả nợ hợp lệ:
-- Chúng ta bắt đầu bằng cách kiểm tra số lượng instruction và đảm bảo rằng chúng ta đang load instruction cuối cùng của transaction
-- Sau đó chúng ta xác minh rằng đó là instruction repay bằng cách kiểm tra program ID và discriminator của instruction
-- Chúng ta kết thúc bằng cách xác minh rằng các ATA được truyền trong instruction repay giống với những gì chúng ta đang truyền trong instruction `Borrow`
+- Chúng ta bắt đầu bằng cách kiểm tra vị trí của lệnh borrow để đảm bảo nó là lệnh duy nhất
+- Sau đó, chúng ta kiểm tra rằng chương trình không được gọi thông qua CPI để đảm bảo rằng không có nhiều lệnh borrow được thực hiện
+- Tiếp theo, chúng ta kiểm tra số lượng lệnh và đảm bảo rằng chúng ta đang tải lệnh cuối cùng của giao dịch
+- Sau đó, chúng ta xác minh rằng đó là lệnh repay bằng cách kiểm tra program ID và discriminator của lệnh
+- Cuối cùng, chúng ta xác minh rằng các ATA được truyền trong lệnh repay giống với những gì chúng ta truyền trong lệnh `Borrow`
 
 ```rust
 /*
@@ -65,6 +67,14 @@ Cuối cùng, chúng ta thực hiện kiểm tra quan trọng nhất: đảm b�
 
     Make sure that the last instruction of this transaction is a repay instruction
 */
+
+// Check if this is the first instruction in the transaction.
+let current_index = load_current_index_checked(&ixs)?;
+require_eq!(current_index, 0, ProtocolError::InvalidIx); 
+
+// Check that the borrow is not invoked through CPI
+let current_instruction = load_instruction_at_checked(0, &ixs).unwrap();
+require!(current_instruction.program_id == crate::ID, ProtocolError::NoCPIBorrowAllowed);
 
 // Check how many instruction we have in this transaction
 let instruction_sysvar = ixs.try_borrow_data()?;
