@@ -239,4 +239,6 @@ if unsafe { instruction.get_account_meta_at_unchecked(1).key } != *self.accounts
 }
 ```
 
+Cuối cùng, hãy lưu ý rằng chúng ta đã không thực hiện bất kỳ kiểm tra nào cho nhiều instruction borrow, hoặc việc borrow thông qua CPI, điều này lẽ ra có thể dẫn đến các khoản vay không được hoàn trả. Nguyên nhân là do tài khoản dữ liệu loan chỉ cho phép một instruction borrow duy nhất (Bạn có thể giải thích tại sao không?), vì vậy các kiểm tra đó là không cần thiết, mặc dù cách tiếp cận này sẽ làm cho các giao dịch có thể được thực thi song song giữa các bậc phí thay vì giữa các pool.
+
 > Việc sử dụng tài khoản `loan` và cấu trúc instruction introspection theo cách này đảm bảo rằng chúng ta thực sự không cần phải thực hiện bất kỳ introspection nào trong lệnh `repay` vì tất cả các kiểm tra hoàn trả sẽ được xử lý bởi tài khoản `loan`.
